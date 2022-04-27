@@ -4,32 +4,19 @@ Perform MCR-ALS on XANES data normalized in Athena (.nor files)
 
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
 import pymcr
 from pymcr.mcr import McrAR
 from pymcr.regressors import OLS, NNLS
 from pymcr.constraints import ConstraintNonneg, ConstraintNorm
+
+from read_data import read_data
 
 
 def main():
     # read in the data
     path = ''
     filename = 'Cu-b26-9_CRS_Cu20_PAMAM_NaCl_w-standards_cal_nor.nor'
-    df = pd.read_table(path + filename, delimiter='\s+', header=15)
-    df = df.shift(periods=1, axis="columns")  # shift data due to '#' column from .nor
-
-    # cut to desired energy range
-    min_energy, max_energy = 8970, 9050
-    df = df[df['energy'].between(min_energy, max_energy)]
-    energies = np.array(df['energy'])
-
-    # plot data
-    for col in df:
-        if col != '#' and col != 'energy':
-            plt.plot(energies, df[col], label=col)
-    plt.legend()
-    plt.xlim(min_energy, max_energy)
-    # plt.show()
+    df, energies = read_data(path, filename, min_energy=8970, max_energy=9050, plot_data=True)
 
     # get ST guess and D
     s_init_df = df.filter(regex=r'(standard|foil)')  # get standards/foil data and put into S guess
