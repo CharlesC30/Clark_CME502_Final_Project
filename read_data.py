@@ -1,5 +1,6 @@
 """
 Read in XANES data normalized in Athena for use in MCR-ALS
+TODD: add data from materials project (https://materialsproject.org/)
 """
 import pandas as pd
 import numpy as np
