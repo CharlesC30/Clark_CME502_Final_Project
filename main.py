@@ -16,17 +16,17 @@ from read_data import read_data
 def main():
     # read in the data
     path = ''
-    filename = 'Cu-b26-9_CRS_Cu20_PAMAM_NaCl_w-standards_cal_nor.nor'
-    df, energies = read_data(path, filename, min_energy=8970, max_energy=9050, plot_data=False)
+    filename = 'CuXX_PAA50_and_Cu20_PAA50_NaCl-treatment.nor'
+    df, energies = read_data(path, filename, min_energy=8970, max_energy=9050, header_line=19, plot_data=True)
 
     # get S guess and D
-    Data_df = df.filter(regex='merge')
+    Data_df = df.filter(regex='PAMAM')
     Data = np.array(Data_df).T
 
     s_init_all = df.filter(regex=r'(standard|foil)')  # get standards/foil data and put into S guess
 
     # loop over all possible combinations of specified number of standards
-    n_standards = s_init_all.keys().size
+    n_standards = s_init_all.keys().size - 2
     for standards in combinations(s_init_all, n_standards):
 
         s_init_df = s_init_all[list(standards)]
@@ -63,12 +63,10 @@ def main():
         m = Data.shape[0]  # number of measurements
         ax6 = plt.subplot(326, title='Concentrations')
         plt.plot(range(m), mcrar.C_opt_)
-        plt.xticks(ticks=range(m), labels=np.arange(0, 91, 30))
-        plt.xlabel('NaCl treatment time (min)')
 
         min_err = np.min(mcrar.err)
-        plt.suptitle(str(min_err))
-        plt.savefig('test_images/five_standards/' + '_'.join(st_names))
+        plt.suptitle(min_err)
+        plt.savefig(f'test_images/{n_standards}_standards/' + '_'.join(st_names))
         # plt.show()
 
 

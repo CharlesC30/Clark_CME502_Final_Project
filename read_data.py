@@ -7,9 +7,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def read_data(path, fn, min_energy, max_energy, plot_data=False):
+def read_data(path, fn, min_energy, max_energy, header_line=0, plot_data=False):
     # get data into dataframe
-    df = pd.read_table(path + fn, delimiter='\s+', header=15)
+    df = pd.read_table(path + fn, delimiter='\s+', header=header_line)
     df = df.shift(periods=1, axis="columns")
 
     # cut to desired energy range
