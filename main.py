@@ -42,22 +42,22 @@ def main():
         # plot results
         plt.figure(figsize=[16, 12])
 
-        ax1 = plt.subplot(321, title='Initial Spectra Guess')
+        ax1 = plt.subplot(221, title='Initial Spectra Guess')
         plt.plot(energies, s_init, label=st_names)
         plt.legend()
 
-        ax2 = plt.subplot(322, sharey=ax1, title='MCR-AR Retrieved Spectra')
+        ax2 = plt.subplot(222, sharey=ax1, title='MCR-AR Retrieved Spectra')
         plt.plot(energies, mcrar.ST_opt_.T)
 
-        ax3 = plt.subplot(323, title='Data')
+        ax3 = plt.subplot(223, title='Data')
         plt.plot(energies, Data.T, label=Data_df.keys())
         plt.legend()
 
-        ax4 = plt.subplot(324, sharey=ax3, title='MCR-AR Fit')
+        ax4 = plt.subplot(224, sharey=ax3, title='MCR-AR Fit')
         D_opt_ = np.dot(mcrar.C_opt_, mcrar.ST_opt_)
         plt.plot(energies, D_opt_.T)
 
-        ax5 = plt.subplot(325, title='Difference')
+        ax5 = plt.subplot(325, title='Difference ($D$ - $D_{cacl}$)')
         plt.plot(energies, (Data - D_opt_).T)
 
         m = Data.shape[0]  # number of measurements
@@ -65,8 +65,8 @@ def main():
         plt.plot(range(m), mcrar.C_opt_)
 
         min_err = np.min(mcrar.err)
-        plt.suptitle(min_err)
-        plt.savefig(f'test_images/{n_standards}_standards/' + '_'.join(st_names))
+        plt.suptitle(f'min mse = {min_err}')
+        plt.savefig(f'test_images/CuXX_and_NaCl-treatment/{n_standards}_standards/' + '_'.join(st_names))
         # plt.show()
 
 
