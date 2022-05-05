@@ -1,5 +1,6 @@
 """
 Perform MCR-ALS on XANES data normalized in Athena (.nor files)
+TODO: add filter for non-physical results
 """
 
 import numpy as np
@@ -16,8 +17,8 @@ from read_data import read_data
 def main():
     # read in the data
     path = ''
-    filename = 'CuXX_PAA50_and_Cu20_PAA50_NaCl-treatment.nor'
-    df, energies = read_data(path, filename, min_energy=8970, max_energy=9050, header_line=19, plot_data=True)
+    filename = 'CuXX_PAA50_and_Cu20_PAA50_NaCl-treatment_and_ISS-twin.nor'
+    df, energies = read_data(path, filename, min_energy=8970, max_energy=9050, plot_data=True)
 
     # get S guess and D
     Data_df = df.filter(regex='PAMAM')
@@ -42,18 +43,18 @@ def main():
         # plot results
         plt.figure(figsize=[16, 12])
 
-        ax1 = plt.subplot(221, title='Initial Spectra Guess')
+        ax1 = plt.subplot(321, title='Initial Spectra Guess')
         plt.plot(energies, s_init, label=st_names)
         plt.legend()
 
-        ax2 = plt.subplot(222, sharey=ax1, title='MCR-AR Retrieved Spectra')
+        ax2 = plt.subplot(322, sharey=ax1, title='MCR-AR Retrieved Spectra')
         plt.plot(energies, mcrar.ST_opt_.T)
 
-        ax3 = plt.subplot(223, title='Data')
+        ax3 = plt.subplot(323, title='Data')
         plt.plot(energies, Data.T, label=Data_df.keys())
         plt.legend()
 
-        ax4 = plt.subplot(224, sharey=ax3, title='MCR-AR Fit')
+        ax4 = plt.subplot(324, sharey=ax3, title='MCR-AR Fit')
         D_opt_ = np.dot(mcrar.C_opt_, mcrar.ST_opt_)
         plt.plot(energies, D_opt_.T)
 
@@ -66,7 +67,7 @@ def main():
 
         min_err = np.min(mcrar.err)
         plt.suptitle(f'min mse = {min_err}')
-        plt.savefig(f'test_images/CuXX_and_NaCl-treatment/{n_standards}_standards/' + '_'.join(st_names))
+        plt.savefig(f'test_images/{n_standards}_standards/' + '_'.join(st_names))
         # plt.show()
 
 
