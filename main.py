@@ -72,14 +72,22 @@ def main():
         min_err = np.min(mcrar.err)
         plt.suptitle(f'min mse = {min_err}')
 
+        # check if result is physically valid
         physical = True
-
+        fitted_standard_avgs = np.mean(mcrar.ST_opt_, axis=1)
+        if (fitted_standard_avgs < 0.5).any() or (fitted_standard_avgs > 2.0).any():
+            physical = False
 
         # check if the output path exits, and if not create it
         if not exists(f'{out_path}/{n_standards}_standards'):
-            makedirs(f'{out_path}/{n_standards}_standards')
+            makedirs(f'{out_path}/{n_standards}_standards/physical')
+            makedirs(f'{out_path}/{n_standards}_standards/non-physical')
 
-        plt.savefig(f'{out_path}/{n_standards}_standards/' + '_'.join(st_names))
+        # save results
+        if physical:
+            plt.savefig(f'{out_path}/{n_standards}_standards/physical/' + '_'.join(st_names))
+        else:
+            plt.savefig(f'{out_path}/{n_standards}_standards/non-physical/' + '_'.join(st_names))
         # plt.show()
 
 
