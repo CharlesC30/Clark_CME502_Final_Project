@@ -1,6 +1,5 @@
 """
 Read in XANES data normalized in Athena (.nor files) for use in MCR-ALS
-TODO: add loop to find header line
 TODD: add data from materials project (https://materialsproject.org/)
 """
 import pandas as pd

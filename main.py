@@ -6,6 +6,8 @@ TODO: add filter for non-physical results
 import numpy as np
 import matplotlib.pyplot as plt
 from itertools import combinations
+from os.path import exists
+from os import makedirs
 
 from pymcr.mcr import McrAR
 from pymcr.regressors import OLS, NNLS
@@ -16,9 +18,11 @@ from read_data import read_data
 
 def main():
     # read in the data
-    path = ''
-    filename = 'CuXX_PAA50_and_Cu20_PAA50_NaCl-treatment_and_ISS-twin.nor'
-    df, energies = read_data(path, filename, min_energy=8970, max_energy=9050, plot_data=True)
+    in_path = ''
+    filename = 'CuXX_PAA50_and_Cu20_PAA50_NaCl-treatment.nor'
+    df, energies = read_data(in_path, filename, min_energy=8970, max_energy=9050, plot_data=True)
+
+    out_path = 'CuXX_and_Cu20_NaCl_treatment'
 
     # get S guess and D
     Data_df = df.filter(regex='PAMAM')
@@ -27,7 +31,7 @@ def main():
     s_init_all = df.filter(regex=r'(standard|foil)')  # get standards/foil data and put into S guess
 
     # loop over all possible combinations of specified number of standards
-    n_standards = s_init_all.keys().size - 2
+    n_standards = s_init_all.keys().size - 1
     for standards in combinations(s_init_all, n_standards):
 
         s_init_df = s_init_all[list(standards)]
@@ -67,7 +71,15 @@ def main():
 
         min_err = np.min(mcrar.err)
         plt.suptitle(f'min mse = {min_err}')
-        plt.savefig(f'test_images/{n_standards}_standards/' + '_'.join(st_names))
+
+        physical = True
+
+
+        # check if the output path exits, and if not create it
+        if not exists(f'{out_path}/{n_standards}_standards'):
+            makedirs(f'{out_path}/{n_standards}_standards')
+
+        plt.savefig(f'{out_path}/{n_standards}_standards/' + '_'.join(st_names))
         # plt.show()
 
 
