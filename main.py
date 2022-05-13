@@ -1,6 +1,15 @@
 """
-Perform MCR-ALS on XANES data normalized in Athena (.nor files)
-TODO: add filter for non-physical results
+Perform MCR-ALS on XANES data normalized using Athena (.nor files)
+This program uses the pyMCR package (available here: https://pages.nist.gov/pyMCR/installing.html)
+
+To run the code specify your input and output directory paths using the 'in_path' and 'out_path' variables in the
+main function.
+Specify the file you would like to run MCR on using the 'filename' variable.
+For testing multiple standard combinations the 'n_standards' variable may be edited.
+
+Results will be saved in a new directory created in the output path.
+The directory will be labeled with the number of standards used for the initial guess and results will be separated
+based on physical validity.
 """
 
 import numpy as np
@@ -31,7 +40,8 @@ def main():
     s_init_all = df.filter(regex=r'(standard|foil)')  # get standards/foil data and put into S guess
 
     # loop over all possible combinations of specified number of standards
-    n_standards = s_init_all.keys().size - 1
+    all_standards = s_init_all.keys().size
+    n_standards = all_standards - 2
     for standards in combinations(s_init_all, n_standards):
 
         s_init_df = s_init_all[list(standards)]
@@ -40,12 +50,17 @@ def main():
         # remove 'number' from standard names
         st_names = [name.split('.', 1)[0] for name in s_init_df.keys()]
 
+        # perform MCR-ALS
         mcrar = McrAR(st_regr=NNLS(), c_regr=OLS(), c_constraints=[ConstraintNonneg(), ConstraintNorm()])
-        # mcrar = McrAR(st_regr=NNLS(), c_regr=NNLS(), c_constraints=[ConstraintNorm()])
         mcrar.fit(Data, ST=s_init.T)
 
         # plot results
-        plt.figure(figsize=[16, 12])
+        plt.figure(figsize=[16, 15])
+
+        plt.rc('xtick', labelsize=15)
+        plt.rc('ytick', labelsize=15)
+        plt.rc('axes', titlesize=18)
+        plt.rc('figure', titlesize=21)
 
         ax1 = plt.subplot(321, title='Initial Spectra Guess')
         plt.plot(energies, s_init, label=st_names)
@@ -78,7 +93,7 @@ def main():
         if (fitted_standard_avgs < 0.5).any() or (fitted_standard_avgs > 2.0).any():
             physical = False
 
-        # check if the output path exits, and if not create it
+        # check if the output path exists, and if not create it
         if not exists(f'{out_path}/{n_standards}_standards'):
             makedirs(f'{out_path}/{n_standards}_standards/physical')
             makedirs(f'{out_path}/{n_standards}_standards/non-physical')
