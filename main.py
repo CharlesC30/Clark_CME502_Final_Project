@@ -10,6 +10,8 @@ For testing multiple standard combinations the 'n_standards' variable may be edi
 Results will be saved in a new directory created in the output path.
 The directory will be labeled with the number of standards used for the initial guess and results will be separated
 based on physical validity.
+
+TODO: output fitted spectra to be used in materials project matcher (https://materialsproject.org/#apps/xas)
 """
 
 import numpy as np

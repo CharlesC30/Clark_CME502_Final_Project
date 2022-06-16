@@ -22,7 +22,7 @@ def read_data(path, fn, min_energy, max_energy, plot_data=False):
     df = pd.read_table(path + fn, delimiter='\s+', header=header_line)
     df = df.shift(periods=1, axis="columns")
 
-    # cut to XANES energy range
+    # crop to XANES energy range
     df = df[df['energy'].between(min_energy, max_energy)]
     energies = np.array(df['energy'])
 
