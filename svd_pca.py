@@ -35,18 +35,25 @@ def svd(a, x):
 
 def mean_center(a):
     a_mean = a.mean(axis=0)  # col means
-    return a - a_mean
+    return a - a_mean, a_mean
 
 
 def pca_svd(a, x):
-    a = mean_center(a)
+    a, a_mean = mean_center(a)
     # plt.plot(a.T)
     # plt.show()
     u, s, vh = np.linalg.svd(a)
     n = s.size
-    plt.plot(x, vh[0])  # first principal direction
+    r = 3
+    for i in range(r):
+        # plot first r PCs
+        plt.plot(x, vh[i])
+        plt.show()
+
+    # plot approximation of data using first r PCs
+    a_approx = u[:, :r] @ np.diag(s[:r]) @ vh[:r]
+    plt.plot(x, (a_approx + a_mean).T)
     plt.show()
-    pc = u @ np.diag(s)
 
     lam = (s**2)/(n - 1)
     print(lam)
@@ -57,7 +64,7 @@ def pca_svd(a, x):
 
 in_path = ''
 filename = 'CuXX_PAA50_and_Cu20_PAA50_NaCl-treatment_and_ISS-twin.nor'
-df, energies = read_data(in_path, filename, min_energy=8970, max_energy=9050, plot_data=False)
+df, energies = read_data(in_path, filename, min_energy=8970, max_energy=9050, plot_data=True)
 
 Data_df = df.filter(regex='PAMAM')
 Data = np.array(Data_df)
