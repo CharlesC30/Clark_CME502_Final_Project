@@ -29,8 +29,11 @@ from read_data import read_data
 
 def main():
     # read in the data
-    in_path = ''
-    filename = 'CuXX_PAA50_and_Cu20_PAA50_NaCl-treatment.nor'
+    # in_path = ''
+    # filename = 'CuXX_PAA50_and_Cu20_PAA50_NaCl-treatment_and_ISS-twin.nor'
+    in_path = r'C:\Users\clark\OneDrive - Stony Brook University\Documents\Karen\Henkel\XANES'
+    filename = r'Cu_PAMAM_iron-substrate.prj'
+
     df, energies = read_data(in_path, filename, min_energy=8970, max_energy=9050, plot_data=True)
 
     out_path = 'CuXX_and_Cu20_NaCl_treatment'
@@ -49,7 +52,7 @@ def main():
         s_init_df = s_init_all[list(standards)]
         s_init = np.array(s_init_df)
 
-        # remove 'number' from standard names
+        # remove number from standard names
         st_names = [name.split('.', 1)[0] for name in s_init_df.keys()]
 
         # perform MCR-ALS
