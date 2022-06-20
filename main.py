@@ -29,17 +29,18 @@ from read_data import read_data
 
 def main():
     # read in the data
-    # in_path = ''
-    # filename = 'CuXX_PAA50_and_Cu20_PAA50_NaCl-treatment_and_ISS-twin.nor'
-    in_path = r'C:\Users\clark\OneDrive - Stony Brook University\Documents\Karen\Henkel\XANES'
-    filename = r'Cu_PAMAM_iron-substrate.prj'
+    in_path = ''
+    filename = 'CuXX_PAA50_and_Cu20_PAA50_NaCl-treatment_and_ISS-twin.nor'
+    # in_path = r'C:\Users\clark\OneDrive - Stony Brook University\Documents\Karen\Henkel\XANES'
+    # filename = r'Cu_PAMAM_iron-substrate.prj'
 
     df, energies = read_data(in_path, filename, min_energy=8970, max_energy=9050, plot_data=True)
 
-    out_path = 'CuXX_and_Cu20_NaCl_treatment'
+    out_path = 'CuXX_and_Cu20_NaCl_treatment_and_ISS-twin'
 
     # get S guess and D
-    Data_df = df.filter(regex='PAMAM')
+    Data_df = df.filter(regex=r'(PAMAM|PAA)')
+    print(Data_df)
     Data = np.array(Data_df).T
 
     s_init_all = df.filter(regex=r'(standard|foil)')  # get standards/foil data and put into S guess
