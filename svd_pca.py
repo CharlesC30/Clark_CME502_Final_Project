@@ -9,6 +9,29 @@ from read_data import read_data
 from sklearn.decomposition import PCA
 
 
+def get_ncomponents(a):
+    """
+    estimate number of pure components using sklearn PCA
+    shows scree plot and prompts user to input number of components
+    sklearn mean-centers data before analysis
+    """
+    pca = PCA()
+    pca.fit(a)
+    lam = pca.explained_variance_
+
+    fig, ax = plt.subplots()
+
+    plt.title('scree plot')
+    plt.xticks(np.arange(1, lam.size, 1))
+    plt.grid()
+    ax.plot(range(1, lam.size+1), lam, marker='o')
+
+    plt.show()
+
+    n_components = int(input('enter number of components from scree plot:\n'))
+    return n_components
+
+
 def svd(a, x):
     # a = a.T
     # a = mean_center(a)
@@ -38,8 +61,10 @@ def mean_center(a):
     return a - a_mean, a_mean
 
 
-def pca_svd(a, x):
-    a, a_mean = mean_center(a)
+def pca_svd(a, x, center_data=True):
+    a_mean = 0
+    if center_data:
+        a, a_mean = mean_center(a)
     # plt.plot(a.T)
     # plt.show()
     u, s, vh = np.linalg.svd(a)
@@ -61,16 +86,19 @@ def pca_svd(a, x):
     plt.plot(range(1, n+1), lam)
     plt.show()
 
-
-in_path = ''
-filename = 'CuXX_PAA50_and_Cu20_PAA50_NaCl-treatment_and_ISS-twin.nor'
-df, energies = read_data(in_path, filename, min_energy=8970, max_energy=9050, plot_data=True)
-
-Data_df = df.filter(regex='PAMAM')
-Data = np.array(Data_df)
+###############
+# Testing stuff
+###############
+# in_path = ''
+# filename = 'CuXX_PAA50_and_Cu20_PAA50_NaCl-treatment_and_ISS-twin.nor'
+# df, energies = read_data(in_path, filename, min_energy=8970, max_energy=9050, plot_data=True)
+#
+# Data_df = df.filter(regex=r'(PAMAM|PAA)')
+# Data = np.array(Data_df)
 
 # svd(Data, energies)  # SVD prefers data in col vectors
-pca_svd(Data.T, energies)  # PCA prefers data in row vectors
+# pca_svd(Data.T, energies)  # PCA prefers data in row vectors
+# get_ncomponents(Data.T)
 
 # # using sklearn PCA
 # pca = PCA()

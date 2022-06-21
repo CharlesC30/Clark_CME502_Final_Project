@@ -2,9 +2,9 @@
 Perform MCR-ALS on XANES data normalized using Athena (.nor files)
 This program uses the pyMCR package (available here: https://pages.nist.gov/pyMCR/installing.html)
 
-To run the code specify your input and output directory paths using the 'in_path' and 'out_path' variables in the
+To run the code specify your input and output directory paths using the 'IN_PATH' and 'OUT_PATH' variables in the
 main function.
-Specify the file you would like to run MCR on using the 'filename' variable.
+Specify the file you would like to run MCR on using the 'FILENAME' variable.
 For testing multiple standard combinations the 'n_standards' variable may be edited.
 
 Results will be saved in a new directory created in the output path.
@@ -25,22 +25,20 @@ from pymcr.regressors import OLS, NNLS
 from pymcr.constraints import ConstraintNonneg, ConstraintNorm
 
 from read_data import read_data
+from svd_pca import get_ncomponents
+
+IN_PATH = ''
+FILENAME = 'CuXX_PAA50_and_Cu20_PAA50_NaCl-treatment_and_ISS-twin.nor'
+OUT_PATH = 'CuXX_and_Cu20_NaCl_treatment_and_ISS-twin'
+USE_PCA = True
 
 
 def main():
     # read in the data
-    in_path = ''
-    filename = 'CuXX_PAA50_and_Cu20_PAA50_NaCl-treatment_and_ISS-twin.nor'
-    # in_path = r'C:\Users\clark\OneDrive - Stony Brook University\Documents\Karen\Henkel\XANES'
-    # filename = r'Cu_PAMAM_iron-substrate.prj'
-
-    df, energies = read_data(in_path, filename, min_energy=8970, max_energy=9050, plot_data=True)
-
-    out_path = 'CuXX_and_Cu20_NaCl_treatment_and_ISS-twin'
+    df, energies = read_data(IN_PATH, FILENAME, min_energy=8970, max_energy=9050, plot_data=True)
 
     # get S guess and D
     Data_df = df.filter(regex=r'(PAMAM|PAA)')
-    print(Data_df)
     Data = np.array(Data_df).T
 
     s_init_all = df.filter(regex=r'(standard|foil)')  # get standards/foil data and put into S guess
@@ -48,6 +46,10 @@ def main():
     # loop over all possible combinations of specified number of standards
     all_standards = s_init_all.keys().size
     n_standards = all_standards - 2
+
+    if USE_PCA:
+        n_standards = get_ncomponents(Data)
+
     for standards in combinations(s_init_all, n_standards):
 
         s_init_df = s_init_all[list(standards)]
@@ -100,15 +102,15 @@ def main():
             physical = False
 
         # check if the output path exists, and if not create it
-        if not exists(f'{out_path}/{n_standards}_standards'):
-            makedirs(f'{out_path}/{n_standards}_standards/physical')
-            makedirs(f'{out_path}/{n_standards}_standards/non-physical')
+        if not exists(f'{OUT_PATH}/{n_standards}_standards'):
+            makedirs(f'{OUT_PATH}/{n_standards}_standards/physical')
+            makedirs(f'{OUT_PATH}/{n_standards}_standards/non-physical')
 
         # save results
         if physical:
-            plt.savefig(f'{out_path}/{n_standards}_standards/physical/' + '_'.join(st_names))
+            plt.savefig(f'{OUT_PATH}/{n_standards}_standards/physical/' + '_'.join(st_names))
         else:
-            plt.savefig(f'{out_path}/{n_standards}_standards/non-physical/' + '_'.join(st_names))
+            plt.savefig(f'{OUT_PATH}/{n_standards}_standards/non-physical/' + '_'.join(st_names))
         # plt.show()
 
 

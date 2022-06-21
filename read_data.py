@@ -1,7 +1,7 @@
 """
 Read in XANES data normalized in Athena (.nor files) for use in MCR-ALS
+Returns dataframe with energies in first column, as well as numpy array of the energies
 TODD: Add ability to read .prj files (using larch) - need same energies
-TODO: Fix .nor file header reading - use names keyword for pd.read_table
 """
 import pandas as pd
 import numpy as np
@@ -24,11 +24,11 @@ def read_data(path, fn, min_energy, max_energy, plot_data=False):
                     name = name.strip()
                     col_names.append(name)
 
-        # loop over lines to find header
+        # loop over lines to find start of data
         data_start = 0
         with open(path + fn, 'r') as data_file:
             for i, line in enumerate(data_file):
-                # in .nor files many -'s are used in line before header
+                # in .nor files many --'s are used two lines before the data
                 if '-----' in line:
                     data_start = i + 2
                     break
@@ -52,6 +52,7 @@ def read_data(path, fn, min_energy, max_energy, plot_data=False):
         return df, energies
 
     elif fn.lower().endswith('.prj'):
+        # WIP
         scans = read_athena(f'{path}\{fn}')
 
         scans_namelist = []
@@ -62,12 +63,3 @@ def read_data(path, fn, min_energy, max_energy, plot_data=False):
             scans_namelist.append(name)
             scans_grouplist.append(group)
             print(name, group)
-
-
-
-
-
-
-
-
-
